@@ -38,8 +38,6 @@ public class ClockWidget : WidgetBase
         _ => new Style1()
     };
 
-    public override FrameworkElement CreateView(PlacedWidget instance)
-    {
-        return new Style1().Build(instance);
-    }
+    // ★★★ CreateView رو حذف کن — از WidgetBase میاد
+    // ★★★ WidgetBase خودش ApplyGlobalStyle رو صدا می‌زنه
 }
