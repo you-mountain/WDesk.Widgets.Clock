@@ -3,7 +3,7 @@
     "name":  "Clock",
     "description":  "Show Time Your Zone",
     "author":  "WDesk Team",
-    "version":  "1.0.3",
+    "version":  "1.0.0",
     "previewEmoji":  "🕐",
     "category":  "Time",
     "tags":  [
