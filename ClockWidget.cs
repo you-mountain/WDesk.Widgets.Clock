@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using WDesk.Core;
 using WDesk.Widgets.Clock.Style;
 
@@ -13,10 +14,8 @@ public class ClockWidget : WidgetBase
         DescriptionKey = "widget.clock.desc",
         Category = WidgetCategory.Time,
         Icon = "\uE823",
-        Author = "WDesk Team",
-        Version = "1.0.0",
-        DefaultWidth = 240,
-        DefaultHeight = 180,
+        DefaultWidth = 100,      // ★ باریک
+        DefaultHeight = 220,     // ★ بلند
         HasSettings = false
     };
 

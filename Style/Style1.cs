@@ -15,6 +15,9 @@ public class Style1 : IStyleBuilder
     {
         var root = new Grid();
 
+        // ═══════════════════════════════════════════
+        //  Background
+        // ═══════════════════════════════════════════
         var bg = new Border
         {
             CornerRadius = new CornerRadius(20)
@@ -22,6 +25,9 @@ public class Style1 : IStyleBuilder
         bg.SetResourceReference(Border.BackgroundProperty, "WidgetBg");
         root.Children.Add(bg);
 
+        // ═══════════════════════════════════════════
+        //  Content
+        // ═══════════════════════════════════════════
         var stack = new StackPanel
         {
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -31,7 +37,7 @@ public class Style1 : IStyleBuilder
 
         var title = new TextBlock
         {
-            Text = "Clock".ToUpper(),
+            Text = "CLOCK",
             FontSize = 10,
             FontWeight = FontWeights.SemiBold,
             HorizontalAlignment = HorizontalAlignment.Center
@@ -39,34 +45,45 @@ public class Style1 : IStyleBuilder
         title.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextMuted");
         stack.Children.Add(title);
 
-        var value = new TextBlock
+        var timeText = new TextBlock
         {
-            Text = "🕐",
-            FontSize = 48,
+            Text = "00:00:00",
+            FontSize = 32,
+            FontWeight = FontWeights.Light,
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 8, 0, 0)
         };
-        value.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextPrimary");
-        stack.Children.Add(value);
+        timeText.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextPrimary");
+        stack.Children.Add(timeText);
 
-        var subtitle = new TextBlock
+        var dateText = new TextBlock
         {
-            Text = "Ready",
+            Text = "",
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 4, 0, 0)
         };
-        subtitle.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextSecondary");
-        stack.Children.Add(subtitle);
+        dateText.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextSecondary");
+        stack.Children.Add(dateText);
 
         root.Children.Add(stack);
 
+        // ═══════════════════════════════════════════
+        //  Timer
+        // ═══════════════════════════════════════════
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         timer.Tick += (_, _) =>
         {
-            subtitle.Text = DateTime.Now.ToString("HH:mm:ss");
+            var now = DateTime.Now;
+            timeText.Text = now.ToString("HH:mm:ss");
+            dateText.Text = now.ToString("dddd, MMMM d");
         };
         timer.Start();
+
+        // آپدیت اولیه
+        var now0 = DateTime.Now;
+        timeText.Text = now0.ToString("HH:mm:ss");
+        dateText.Text = now0.ToString("dddd, MMMM d");
 
         root.Unloaded += (_, _) => timer.Stop();
 

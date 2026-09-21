@@ -1,18 +1,20 @@
 ﻿{
-  "id": "clock",
-  "name": "Clock",
-  "description": "Show Time Your Zone",
-  "author": "WDesk Team",
-  "version": "1.0.0",
-  "previewEmoji": "🕐",
-  "category": "Time",
-  "tags": ["clock"],
-  "mainAssembly": "WDesk.Widgets.Clock.dll",
-  "mainType": "WDesk.Widgets.Clock.ClockWidget",
-  "minWDeskVersion": "1.0.0",
-  "isPaid": false,
-  "price": 0,
-  "currency": "USD",
-  "official": true,
-  "licenseServerUrl": ""
+    "id":  "clock",
+    "name":  "Clock",
+    "description":  "Show Time Your Zone",
+    "author":  "WDesk Team",
+    "version":  "1.0.0",
+    "previewEmoji":  "🕐",
+    "category":  "Time",
+    "tags":  [
+                 "clock"
+             ],
+    "mainAssembly":  "WDesk.Widgets.Clock.dll",
+    "mainType":  "WDesk.Widgets.Clock.ClockWidget",
+    "minWDeskVersion":  "1.0.0",
+    "isPaid":  false,
+    "price":  0,
+    "currency":  "USD",
+    "official":  true,
+    "licenseServerUrl":  ""
 }
