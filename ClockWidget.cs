@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Windows;
 using WDesk.Core;
 using WDesk.Widgets.Clock.Style;
@@ -14,9 +14,28 @@ public class ClockWidget : WidgetBase
         DescriptionKey = "widget.clock.desc",
         Category = WidgetCategory.Time,
         Icon = "\uE823",
-        DefaultWidth = 100,      // ★ باریک
-        DefaultHeight = 220,     // ★ بلند
+        Author = "WDesk Team",
+        Version = "1.0.0",
+        DefaultWidth = 240,
+        DefaultHeight = 180,
         HasSettings = false
+    };
+
+    public override IEnumerable<WStyle> GetStyles() => new List<WStyle>
+    {
+        new()
+        {
+            Id = "style1",
+            Name = "Default",
+            Icon = "\uE823",
+            PreviewEmoji = "🕐"
+        }
+    };
+
+    public override IStyleBuilder? GetStyleBuilder(string styleId) => styleId switch
+    {
+        "style1" => new Style1(),
+        _ => new Style1()
     };
 
     public override FrameworkElement CreateView(PlacedWidget instance)
