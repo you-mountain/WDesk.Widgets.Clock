@@ -1,13 +1,17 @@
 ﻿{
     "id":  "clock",
     "name":  "Clock",
-    "description":  "Show Time Your Zone",
+    "description":  "Beautiful clock with 4 styles, time zones, date formats",
     "author":  "WDesk Team",
-    "version":  "1.0.1",
+    "version":  "1.0.2",
     "previewEmoji":  "🕐",
     "category":  "Time",
     "tags":  [
-                 "clock"
+                 "clock",
+                 "time",
+                 "date",
+                 "analog",
+                 "digital"
              ],
     "mainAssembly":  "WDesk.Widgets.Clock.dll",
     "mainType":  "WDesk.Widgets.Clock.ClockWidget",

@@ -1,39 +1,37 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using WDesk.Core;
 
 namespace WDesk.Widgets.Clock.Style;
 
-public class Style1 : IStyleBuilder
+public class Style4 : IStyleBuilder
 {
-    public string StyleId => "style1";
+    public string StyleId => "style4";
 
     private DispatcherTimer? _timer;
 
     public FrameworkElement Build(PlacedWidget instance)
     {
-        // ═══ تنظیمات ═══
         var is24Hour = GetSetting(instance, "clock_format_24", "true") == "true";
         var showSeconds = GetSetting(instance, "clock_show_seconds", "true") == "true";
         var showDate = GetSetting(instance, "clock_show_date", "true") == "true";
         var dateFormat = GetSetting(instance, "clock_date_format", "long");
         var timezone = GetSetting(instance, "clock_timezone", "Local");
         var showAmPm = GetSetting(instance, "clock_show_ampm", "true") == "true";
-        var fontSizeStr = GetSetting(instance, "clock_font_size", "32");
-        var fontSize = double.TryParse(fontSizeStr, out var fs) ? fs : 32;
 
         // ═══ ROOT ═══
         var root = new Grid();
 
-        // ═══ BACKGROUND ═══
+        // ── Background (تیره‌تر) ═══
         var bg = new Border
         {
-            CornerRadius = new CornerRadius(16)
+            CornerRadius = new CornerRadius(16),
+            Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x12))
         };
-        bg.SetResourceReference(Border.BackgroundProperty, "WidgetBg");
         root.Children.Add(bg);
 
         // ═══ CONTENT ═══
@@ -41,42 +39,74 @@ public class Style1 : IStyleBuilder
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(16)
+            Margin = new Thickness(20)
         };
 
         // ── Title ──
         var title = new TextBlock
         {
-            Text = "CLOCK",
-            FontSize = 10,
+            Text = "◆ NEON CLOCK ◆",
+            FontSize = 9,
             FontWeight = FontWeights.SemiBold,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Opacity = 0.7
+            Foreground = (Brush)Application.Current.FindResource("WidgetAccent")
         };
-        title.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextMuted");
+        title.Effect = new DropShadowEffect
+        {
+            Color = GetAccentColor(instance),
+            BlurRadius = 12,
+            ShadowDepth = 0,
+            Opacity = 0.8
+        };
         stack.Children.Add(title);
 
         // ── Time ──
         var timeText = new TextBlock
         {
-            FontSize = fontSize,
+            FontSize = 42,
             FontWeight = FontWeights.Light,
+            FontFamily = new FontFamily("Cascadia Mono, Consolas"),
             HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 6, 0, 0)
+            Margin = new Thickness(0, 10, 0, 0)
         };
-        timeText.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextPrimary");
+        timeText.SetResourceReference(TextBlock.ForegroundProperty, "WidgetAccent");
+        timeText.Effect = new DropShadowEffect
+        {
+            Color = GetAccentColor(instance),
+            BlurRadius = 20,
+            ShadowDepth = 0,
+            Opacity = 1.0
+        };
         stack.Children.Add(timeText);
 
         // ── Date ──
         var dateText = new TextBlock
         {
-            FontSize = 11,
+            FontSize = 10,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 6, 0, 0),
-            Visibility = showDate ? Visibility.Visible : Visibility.Collapsed
+            Margin = new Thickness(0, 10, 0, 0),
+            Visibility = showDate ? Visibility.Visible : Visibility.Collapsed,
+            Foreground = new SolidColorBrush(Color.FromArgb(0x80, 0xFF, 0xFF, 0xFF))
         };
-        dateText.SetResourceReference(TextBlock.ForegroundProperty, "WidgetTextSecondary");
         stack.Children.Add(dateText);
+
+        // ── Line ──
+        var line = new Border
+        {
+            Height = 1,
+            Width = 80,
+            Margin = new Thickness(0, 8, 0, 0),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Background = (Brush)Application.Current.FindResource("WidgetAccent")
+        };
+        line.Effect = new DropShadowEffect
+        {
+            Color = GetAccentColor(instance),
+            BlurRadius = 8,
+            ShadowDepth = 0,
+            Opacity = 0.8
+        };
+        stack.Children.Add(line);
 
         root.Children.Add(stack);
 
@@ -85,9 +115,7 @@ public class Style1 : IStyleBuilder
         {
             var now = GetTimeInZone(timezone);
 
-            // ── Time ──
             string timeStr;
-
             if (is24Hour)
             {
                 timeStr = showSeconds
@@ -108,19 +136,14 @@ public class Style1 : IStyleBuilder
 
             timeText.Text = timeStr;
 
-            // ── Date ──
             if (showDate)
-            {
                 dateText.Text = FormatDate(now, dateFormat);
-            }
         };
 
-        // ═══ TIMER ═══
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += (_, _) => updateUI();
         _timer.Start();
 
-        // ★ آپدیت اولیه — با Dispatcher برای اطمینان از Loaded
         updateUI();
 
         Dispatcher.CurrentDispatcher.BeginInvoke(new Action(updateUI),
@@ -139,9 +162,41 @@ public class Style1 : IStyleBuilder
         return root;
     }
 
-    // ═══════════════════════════════════════════
-    //  Helpers
-    // ═══════════════════════════════════════════
+    private static Color GetAccentColor(PlacedWidget instance)
+{
+    try
+    {
+        // ★ اگه ویجت accent custom داره
+        if (instance.Settings.TryGetValue("accentColor", out var hex) &&
+            !string.IsNullOrEmpty(hex))
+        {
+            return (Color)ColorConverter.ConvertFromString(hex);
+        }
+
+        // ★ از Resource بخون (WDesk accent رو توی Application.Current.Resources ست می‌کنه)
+        try
+        {
+            var app = Application.Current;
+            if (app != null)
+            {
+                var accentBrush = app.TryFindResource("WidgetAccent") as SolidColorBrush
+                    ?? app.TryFindResource("AccentBrush") as SolidColorBrush;
+
+                if (accentBrush != null)
+                    return accentBrush.Color;
+            }
+        }
+        catch { }
+
+        // ★ Fallback
+        return Color.FromRgb(0x3B, 0x82, 0xF6);
+    }
+    catch
+    {
+        return Color.FromRgb(0x3B, 0x82, 0xF6);
+    }
+}
+
     private static string GetSetting(PlacedWidget instance, string key, string defaultVal)
     {
         return instance.Settings.TryGetValue(key, out var val) && !string.IsNullOrEmpty(val)
@@ -162,10 +217,7 @@ public class Style1 : IStyleBuilder
             var tz = TimeZoneInfo.FindSystemTimeZoneById(timezoneId);
             return TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
         }
-        catch
-        {
-            return DateTime.Now;
-        }
+        catch { return DateTime.Now; }
     }
 
     private static string FormatDate(DateTime dt, string format)
@@ -186,15 +238,9 @@ public class Style1 : IStyleBuilder
         try
         {
             var pc = new System.Globalization.PersianCalendar();
-            var y = pc.GetYear(dt);
-            var m = pc.GetMonth(dt);
-            var d = pc.GetDayOfMonth(dt);
-            return $"{y}/{m:00}/{d:00}";
+            return $"{pc.GetYear(dt)}/{pc.GetMonth(dt):00}/{pc.GetDayOfMonth(dt):00}";
         }
-        catch
-        {
-            return dt.ToString("yyyy/MM/dd");
-        }
+        catch { return dt.ToString("yyyy/MM/dd"); }
     }
 
     private static string GetHijriDate(DateTime dt)
@@ -202,14 +248,8 @@ public class Style1 : IStyleBuilder
         try
         {
             var hc = new System.Globalization.HijriCalendar();
-            var y = hc.GetYear(dt);
-            var m = hc.GetMonth(dt);
-            var d = hc.GetDayOfMonth(dt);
-            return $"{y}/{m:00}/{d:00}";
+            return $"{hc.GetYear(dt)}/{hc.GetMonth(dt):00}/{hc.GetDayOfMonth(dt):00}";
         }
-        catch
-        {
-            return dt.ToString("yyyy/MM/dd");
-        }
+        catch { return dt.ToString("yyyy/MM/dd"); }
     }
 }
